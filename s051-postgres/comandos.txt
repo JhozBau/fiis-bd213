@@ -1,0 +1,20 @@
+--SOLO PARA INSTALACION LOCAL (no para Docker)
+--Permite crear un nuevo cluster de BD (ejecutenlo solo la primera vez)
+pg_ctl initdb -D ../data
+
+--Iniciar el servidor de BD
+pg_ctl start -D ../data
+
+--Inicia el terminal
+psql -d postgres
+
+--Una vez dentro, podemos ejecutar cualquier comando SQL
+
+--Crear BD
+CREATE DATABASE fiis_dbd211;
+
+--Crear usuario
+CREATE USER usuario WITH ENCRYPTED PASSWORD 'password';
+
+--Dar privilegios sobre la BD al usuario creado.
+GRANT ALL PRIVILEGES ON DATABASE fiis_dbd211 TO usuario;
