@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>Prueba Vue</title>
+</head>
+<body>
+    <div id="elemento">
+        <h1>{{saludo}}</h1>
+        <h2>{{saludo2}}</h2>
+        <table>
+            <tr>
+                <td><button v-on:click="cambiarOpcion()">Cambiar...</button></td>
+            </tr>
+        </table>
+        
+
+        <table v-if="mostrar" border="1">
+            <th>Codigo</th>
+            <th>Nombre</th>
+            <th>Promedio</th>
+            <th>Crédito Disponible</th>
+            
+            <tr v-for="alu in alumnos">
+                <td>{{alu.codigo}}</td>
+                <td>{{alu.nombre}}</td>
+                <td>{{alu.promedio}}</td> 
+                <td>{{alu.creditoDisponible}}</td>                            
+            </tr>
+        </table>
+        <table v-else>
+            <tr>
+                <td>Nombre: </td>
+                <td><input v-model="alumno.nombre" type="text"></td>        
+            </tr>
+            <tr>
+                <td>Promedio: </td>
+                <td><input v-model="alumno.promedio" type="text"></td>        
+            </tr> 
+            <tr>
+                <td>Crédito Disponible: </td>
+                <td><input v-model="alumno.creditoDisponible" type="text"></td>        
+            </tr> 
+            <tr>
+                <td><button v-on:click="registrar">Registrar</button></td>                
+            </tr>
+            <tr>
+                <td>{{mensaje}}</td>
+            </tr>
+        </table>
+        
+    </div>
+        
+    <script>
+        const app = new Vue(    {
+                                    el: "#elemento",
+                                    data:   {
+                                                alumnos: null,
+                                                alumno: {},
+                                                mostrar: true,
+                                                mensaje:null
+                                            },
+                                    mounted(){
+                                        this.cargarAlumnos();
+                                    },
+                                    methods: {
+                                        registrar: function(event){
+                                            axios.post("http://localhost:8080/alumnos", this.alumno)
+                                                .then(response => this.mensaje = "Registrado correctamente")
+                                        },
+                                        cargarAlumnos: function(event){
+                                            axios.get("http://localhost:8080/alumnos")
+                                            .then(response => (this.alumnos = response.data))
+                                        },
+                                        cambiarOpcion: function(event){
+                                            this.mostrar = !this.mostrar;
+                                            if(this.mostrar){
+                                                this.cargarAlumnos();
+                                            }else{
+                                                this.alumno.nombre = "";
+                                                this.alumno.promedio = "";
+                                                this.alumno.creditoDisponible = "";
+                                                this.mensaje = "";
+                                            }
+                                            
+                                            
+                                        }
+                                        
+                                    }
+                                });
+    </script>
+</body>
+</html>

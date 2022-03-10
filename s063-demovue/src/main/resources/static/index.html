@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.2/css/bulma.min.css">
+    <title>Prueba Vue</title>
+</head>
+<body>
+    <div id="elemento">
+        <div class="card">
+            <div class="card-content">
+                <h1 class="title">Prueba Vue</h1>
+                <h2 class="subtitle">Seleccione opción</h2>
+                <div class="field">                    
+                    <div class="control">
+                        <button class="button is-success" v-on:click="cambiarOpcion()">{{mostrar ? "Registrar" : "Mostrar Todos"}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="mostrar" class="card">
+            <div class="card-content">
+                <table class="table">
+                    <th>Codigo</th>
+                    <th>Nombre</th>
+                    <th>Promedio</th>
+                    <th>Crédito Disponible</th>                    
+                    <tr v-for="alu in alumnos">
+                        <td>{{alu.codigo}}</td>
+                        <td>{{alu.nombre}}</td>
+                        <td>{{alu.promedio}}</td> 
+                        <td>{{alu.creditoDisponible}}</td>                            
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div v-else class="card">
+            <div class="card-content">
+                <div class="field">
+                    <label class="label">Nombre</label>
+                    <div class="control">
+                        <input class="input" v-model="alumno.nombre" type="text">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Promedio</label>
+                    <div class="control">
+                        <input class="input" v-model="alumno.promedio" type="text">
+                    </div>
+
+                </div>
+                <div class="field">
+                    <label class="label">Crédito Disponible</label>
+                    <div class="control">
+                        <input class="input" v-model="alumno.creditoDisponible" type="text">
+                    </div>
+                </div>
+                <div class="field">
+                    <button class="button is-success" v-on:click="registrar">Registrar</button>                    
+                    <p v-if="error" class="help is-danger">{{mensaje}}</p>
+                    <p v-else class="help is-success">{{mensaje}}</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+        
+    <script>
+        const app = new Vue(    {
+                                    el: "#elemento",
+                                    data:   {
+                                                alumnos: null,
+                                                alumno: {},
+                                                mostrar: true,
+                                                mensaje: null,
+                                                error: false                                                
+                                            },
+                                    mounted(){
+                                        this.cargarAlumnos();
+                                    },
+                                    methods: {
+                                        registrar: function(event){
+                                            axios.post("http://localhost:8080/alumnos", this.alumno)
+                                                .then(response =>   {                                                                           
+                                                                        this.limpiarFormulario();
+                                                                        this.mensaje = "Registrado correctamente"
+                                                                        this.error = false;
+                                                                    })
+                                                .catch(err =>   {                                                                       
+                                                                    this.mensaje = "Se produjo un error"
+                                                                    this.error = true
+                                                                    console.log(err);
+                                                                }
+                                                );
+                                        },
+                                        cargarAlumnos: function(event){
+                                            axios.get("http://localhost:8080/alumnos")
+                                            .then(response => (this.alumnos = response.data))
+                                        },
+                                        cambiarOpcion: function(event){
+                                            this.mostrar = !this.mostrar;
+                                            if(this.mostrar){
+                                                this.cargarAlumnos();
+                                            }else{
+                                                this.limpiarFormulario();
+                                            }
+                                        },
+                                        limpiarFormulario: function(event){
+                                            this.alumno.nombre = "";
+                                            this.alumno.promedio = "";
+                                            this.alumno.creditoDisponible = "";
+                                            this.mensaje = "";
+                                        }
+                                        
+                                    }
+                                });
+    </script>
+</body>
+</html>
